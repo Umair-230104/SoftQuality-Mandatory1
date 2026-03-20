@@ -1,0 +1,18 @@
+package app.dtos;
+
+import app.Enum.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CprNameGenderDTO {
+    private String cpr;
+    private String firstName;
+    private String lastName;
+    private Gender gender;
+}

@@ -1,5 +1,3 @@
-Her er en **clean og nem README**, som dine gruppemedlemmer kan følge uden at blive forvirret:
-
 ---
 
 # 🚀 FakeInfo Backend – Setup Guide
@@ -120,7 +118,3 @@ Hvis noget ikke virker:
 
 ---
 
-Sig til hvis du vil have:
-
-* README med billeder (til GitHub)
-* eller en endnu kortere version til aflevering 👍

@@ -1,0 +1,1034 @@
+{
+  "info": {
+    "_postman_id": "088ba525-14f6-46ab-8827-40710a699ea8",
+    "name": "FakeInfo API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52339084",
+    "_collection_link": "https://go.postman.co/collection/52339084-088ba525-14f6-46ab-8827-40710a699ea8?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "GET /cpr",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response time is under 1000ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "const cpr = data.cpr || data;",
+              "",
+              "pm.test(\"CPR exists\", function () {",
+              "    pm.expect(cpr).to.exist;",
+              "});",
+              "",
+              "pm.test(\"CPR has 10 digits\", function () {",
+              "    pm.expect(String(cpr)).to.match(/^\\d{10}$/);",
+              "});",
+              "",
+              "pm.test(\"CPR first 6 digits look like ddMMyy\", function () {",
+              "    const cprStr = String(cpr);",
+              "    const dd = parseInt(cprStr.substring(0,2));",
+              "    const mm = parseInt(cprStr.substring(2,4));",
+              "    pm.expect(dd).to.be.within(1,31);",
+              "    pm.expect(mm).to.be.within(1,12);",
+              "});",
+              "",
+              "pm.test(\"CPR must not contain letters\", function () {",
+              "    pm.expect(String(cpr)).to.not.match(/[A-Za-z]/);",
+              "});",
+              "",
+              "pm.test(\"Server should not fail\", function () {",
+              "    pm.expect(pm.response.code).to.not.equal(500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cpr",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "cpr"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /name-gender",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "",
+              "pm.test(\"Fields exist\", function () {",
+              "    pm.expect(data.firstName).to.exist;",
+              "    pm.expect(data.lastName).to.exist;",
+              "    pm.expect(data.gender).to.exist;",
+              "});",
+              "",
+              "pm.test(\"Fields are strings\", function () {",
+              "    pm.expect(data.firstName).to.be.a(\"string\");",
+              "    pm.expect(data.lastName).to.be.a(\"string\");",
+              "    pm.expect(data.gender).to.be.a(\"string\");",
+              "});",
+              "",
+              "pm.test(\"Names are not empty\", function () {",
+              "    pm.expect(data.firstName.trim()).to.not.eql(\"\");",
+              "    pm.expect(data.lastName.trim()).to.not.eql(\"\");",
+              "});",
+              "",
+              "pm.test(\"Gender is valid\", function () {",
+              "    pm.expect(data.gender.toLowerCase()).to.be.oneOf([\"male\", \"female\"]);",
+              "});",
+              "",
+              "pm.test(\"Gender must not be null or empty\", function () {",
+              "    pm.expect(data.gender).to.not.be.oneOf([null, \"\"]);",
+              "});",
+              "",
+              "pm.test(\"Server should not fail\", function () {",
+              "    pm.expect(pm.response.code).to.not.equal(500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/name-gender",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "name-gender"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /name-gender-dob",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "",
+              "pm.test(\"Fields exist\", function () {",
+              "    pm.expect(data.firstName).to.exist;",
+              "    pm.expect(data.lastName).to.exist;",
+              "    pm.expect(data.gender).to.exist;",
+              "    pm.expect(data.dateOfBirth).to.exist;",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth is an array with 3 parts\", function () {",
+              "    pm.expect(data.dateOfBirth).to.be.an(\"array\");",
+              "    pm.expect(data.dateOfBirth.length).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth contains valid year, month, day\", function () {",
+              "    const [year, month, day] = data.dateOfBirth;",
+              "    pm.expect(year).to.be.a(\"number\");",
+              "    pm.expect(month).to.be.within(1, 12);",
+              "    pm.expect(day).to.be.within(1, 31);",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth is not in the future\", function () {",
+              "    const [year, month, day] = data.dateOfBirth;",
+              "    const dob = new Date(year, month - 1, day);",
+              "    pm.expect(dob.getTime()).to.be.below(Date.now());",
+              "});",
+              "",
+              "pm.test(\"Gender is valid\", function () {",
+              "    pm.expect(data.gender.toLowerCase()).to.be.oneOf([\"male\", \"female\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/name-gender-dob",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "name-gender-dob"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /cpr-name-gender",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "const cpr = String(data.cpr);",
+              "const gender = data.gender.toLowerCase();",
+              "const lastDigit = parseInt(cpr[cpr.length - 1]);",
+              "",
+              "pm.test(\"CPR and gender exist\", function () {",
+              "    pm.expect(cpr).to.match(/^\\d{10}$/);",
+              "    pm.expect(gender).to.be.oneOf([\"male\", \"female\"]);",
+              "});",
+              "",
+              "pm.test(\"First and last name exist\", function () {",
+              "    pm.expect(data.firstName).to.exist;",
+              "    pm.expect(data.lastName).to.exist;",
+              "});",
+              "",
+              "pm.test(\"Names are not empty\", function () {",
+              "    pm.expect(data.firstName.trim()).to.not.eql(\"\");",
+              "    pm.expect(data.lastName.trim()).to.not.eql(\"\");",
+              "});",
+              "",
+              "pm.test(\"CPR last digit matches gender rule\", function () {",
+              "    if (gender === \"female\") {",
+              "        pm.expect(lastDigit % 2).to.eql(0);",
+              "    } else if (gender === \"male\") {",
+              "        pm.expect(lastDigit % 2).to.eql(1);",
+              "    }",
+              "});",
+              "",
+              "pm.test(\"CPR must not have wrong length\", function () {",
+              "    pm.expect(cpr.length).to.eql(10);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cpr-name-gender",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "cpr-name-gender"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /cpr-name-gender-dob",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "const cpr = String(data.cpr);",
+              "const gender = data.gender.toLowerCase();",
+              "const dob = data.dateOfBirth;",
+              "",
+              "pm.test(\"All required fields exist\", function () {",
+              "    pm.expect(data.firstName).to.exist;",
+              "    pm.expect(data.lastName).to.exist;",
+              "    pm.expect(data.gender).to.exist;",
+              "    pm.expect(data.dateOfBirth).to.exist;",
+              "    pm.expect(data.cpr).to.exist;",
+              "});",
+              "",
+              "pm.test(\"CPR is 10 digits\", function () {",
+              "    pm.expect(cpr).to.match(/^\\d{10}$/);",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth is an array with 3 parts\", function () {",
+              "    pm.expect(dob).to.be.an(\"array\");",
+              "    pm.expect(dob.length).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth matches CPR first 6 digits\", function () {",
+              "    const cprDD = cpr.substring(0,2);",
+              "    const cprMM = cpr.substring(2,4);",
+              "    const cprYY = cpr.substring(4,6);",
+              "",
+              "    const year = String(dob[0]);",
+              "    const month = String(dob[1]).padStart(2, \"0\");",
+              "    const day = String(dob[2]).padStart(2, \"0\");",
+              "    const dobYY = year.slice(-2);",
+              "",
+              "    pm.expect(day).to.eql(cprDD);",
+              "    pm.expect(month).to.eql(cprMM);",
+              "    pm.expect(dobYY).to.eql(cprYY);",
+              "});",
+              "",
+              "pm.test(\"CPR last digit matches gender\", function () {",
+              "    const lastDigit = parseInt(cpr[cpr.length - 1]);",
+              "    if (gender === \"female\") pm.expect(lastDigit % 2).to.eql(0);",
+              "    if (gender === \"male\") pm.expect(lastDigit % 2).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth is a valid date\", function () {",
+              "    const [year, month, day] = dob;",
+              "    const d = new Date(year, month - 1, day);",
+              "    pm.expect(isNaN(d.getTime())).to.eql(false);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cpr-name-gender-dob",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "cpr-name-gender-dob"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /address",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "",
+              "pm.test(\"Address fields exist\", function () {",
+              "    pm.expect(data.street).to.exist;",
+              "    pm.expect(data.number).to.exist;",
+              "    pm.expect(data.floor).to.exist;",
+              "    pm.expect(data.door).to.exist;",
+              "    pm.expect(data.postalCode).to.exist;",
+              "    pm.expect(data.town).to.exist;",
+              "});",
+              "",
+              "pm.test(\"Street and town are not empty\", function () {",
+              "    pm.expect(data.street.trim()).to.not.eql(\"\");",
+              "    pm.expect(data.town.trim()).to.not.eql(\"\");",
+              "});",
+              "",
+              "pm.test(\"Postal code is 4 digits\", function () {",
+              "    pm.expect(String(data.postalCode)).to.match(/^\\d{4}$/);",
+              "});",
+              "",
+              "pm.test(\"House number format is valid\", function () {",
+              "    pm.expect(String(data.number)).to.match(/^\\d{1,3}[A-Z]?$/);",
+              "});",
+              "",
+              "pm.test(\"Floor format is valid\", function () {",
+              "    pm.expect(String(data.floor)).to.match(/^(st|[1-9][0-9]?)$/);",
+              "});",
+              "",
+              "pm.test(\"Door format is valid\", function () {",
+              "    pm.expect(String(data.door)).to.match(/^(th|mf|tv|([1-9]|[1-4][0-9]|50)|[a-z]-?\\d{1,3})$/);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/address",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "address"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /phone",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const validPrefixes = [\"2\", \"30\", \"31\", \"40\", \"41\", \"42\", \"50\", \"51\", \"52\", \"53\", \"60\", \"61\", \"71\", \"81\", \"91\", \"92\", \"93\", \"342\", \"344\", \"345\", \"346\", \"347\", \"348\", \"349\", \"356\", \"357\", \"359\", \"362\", \"365\", \"366\", \"389\", \"398\", \"431\", \"441\", \"462\", \"466\", \"468\", \"472\", \"474\", \"476\", \"478\", \"485\", \"486\", \"488\", \"489\", \"493\", \"494\", \"495\", \"496\", \"498\", \"499\", \"542\", \"543\", \"545\", \"551\", \"552\", \"556\", \"571\", \"572\", \"573\", \"574\", \"577\", \"579\", \"584\", \"586\", \"587\", \"589\", \"597\", \"598\", \"627\", \"629\", \"641\", \"649\", \"658\", \"662\", \"663\", \"664\", \"665\", \"667\", \"692\", \"693\", \"694\", \"697\", \"771\", \"772\", \"782\", \"783\", \"785\", \"786\", \"788\", \"789\", \"826\", \"827\", \"829\"];",
+              "const data = pm.response.json();",
+              "const phone = String(data.phoneNumber || data.phone || data);",
+              "",
+              "pm.test(\"Phone exists\", function () {",
+              "    pm.expect(phone).to.exist;",
+              "});",
+              "",
+              "pm.test(\"Phone has 8 digits\", function () {",
+              "    pm.expect(phone).to.match(/^\\d{8}$/);",
+              "});",
+              "",
+              "pm.test(\"Phone starts with valid prefix\", function () {",
+              "    const isValid = validPrefixes.some(prefix => phone.startsWith(prefix));",
+              "    pm.expect(isValid).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"Phone must not contain letters or hyphen\", function () {",
+              "    pm.expect(phone).to.not.match(/[A-Za-z-]/);",
+              "});",
+              "",
+              "pm.test(\"Phone length must not be shorter or longer than 8\", function () {",
+              "    pm.expect(phone.length).to.eql(8);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/phone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "phone"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /person",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const p = pm.response.json();",
+              "",
+              "pm.test(\"Person contains all main fields\", function () {",
+              "    pm.expect(p.cpr).to.exist;",
+              "    pm.expect(p.firstName).to.exist;",
+              "    pm.expect(p.lastName).to.exist;",
+              "    pm.expect(p.gender).to.exist;",
+              "    pm.expect(p.dateOfBirth).to.exist;",
+              "    pm.expect(p.phoneNumber).to.exist;",
+              "    pm.expect(p.address).to.exist;",
+              "});",
+              "",
+              "pm.test(\"Address object exists\", function () {",
+              "    pm.expect(p.address.street).to.exist;",
+              "    pm.expect(p.address.number).to.exist;",
+              "    pm.expect(p.address.floor).to.exist;",
+              "    pm.expect(p.address.door).to.exist;",
+              "    pm.expect(p.address.postalCode).to.exist;",
+              "    pm.expect(p.address.town).to.exist;",
+              "});",
+              "",
+              "pm.test(\"CPR is 10 digits\", function () {",
+              "    pm.expect(String(p.cpr)).to.match(/^\\d{10}$/);",
+              "});",
+              "",
+              "pm.test(\"Phone is 8 digits\", function () {",
+              "    pm.expect(String(p.phoneNumber)).to.match(/^\\d{8}$/);",
+              "});",
+              "",
+              "pm.test(\"dateOfBirth matches CPR first 6 digits\", function () {",
+              "    const cpr = String(p.cpr);",
+              "    const cprDD = cpr.substring(0,2);",
+              "    const cprMM = cpr.substring(2,4);",
+              "    const cprYY = cpr.substring(4,6);",
+              "",
+              "    const year = String(p.dateOfBirth[0]);",
+              "    const month = String(p.dateOfBirth[1]).padStart(2, \"0\");",
+              "    const day = String(p.dateOfBirth[2]).padStart(2, \"0\");",
+              "    const dobYY = year.slice(-2);",
+              "",
+              "    pm.expect(day).to.eql(cprDD);",
+              "    pm.expect(month).to.eql(cprMM);",
+              "    pm.expect(dobYY).to.eql(cprYY);",
+              "});",
+              "",
+              "pm.test(\"CPR last digit matches gender\", function () {",
+              "    const cpr = String(p.cpr);",
+              "    const lastDigit = parseInt(cpr[cpr.length - 1]);",
+              "    const gender = p.gender.toLowerCase();",
+              "",
+              "    if (gender === \"female\") pm.expect(lastDigit % 2).to.eql(0);",
+              "    if (gender === \"male\") pm.expect(lastDigit % 2).to.eql(1);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/person",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "person"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const people = pm.response.json();",
+              "const count = parseInt(pm.request.url.path[pm.request.url.path.length - 1]);",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    pm.expect(people).to.be.an(\"array\");",
+              "});",
+              "",
+              "pm.test(\"Array length matches count\", function () {",
+              "    pm.expect(people.length).to.eql(count);",
+              "});",
+              "",
+              "pm.test(\"Each person has required fields\", function () {",
+              "    people.forEach(p => {",
+              "        pm.expect(p.cpr).to.exist;",
+              "        pm.expect(p.firstName).to.exist;",
+              "        pm.expect(p.lastName).to.exist;",
+              "        pm.expect(p.gender).to.exist;",
+              "        pm.expect(p.dateOfBirth).to.exist;",
+              "        pm.expect(p.phoneNumber).to.exist;",
+              "        pm.expect(p.address).to.exist;",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/10",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const people = pm.response.json();",
+              "const count = parseInt(pm.request.url.path[pm.request.url.path.length - 1]);",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    pm.expect(people).to.be.an(\"array\");",
+              "});",
+              "",
+              "pm.test(\"Array length matches count\", function () {",
+              "    pm.expect(people.length).to.eql(count);",
+              "});",
+              "",
+              "pm.test(\"Each person has required fields\", function () {",
+              "    people.forEach(p => {",
+              "        pm.expect(p.cpr).to.exist;",
+              "        pm.expect(p.firstName).to.exist;",
+              "        pm.expect(p.lastName).to.exist;",
+              "        pm.expect(p.gender).to.exist;",
+              "        pm.expect(p.dateOfBirth).to.exist;",
+              "        pm.expect(p.phoneNumber).to.exist;",
+              "        pm.expect(p.address).to.exist;",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "10"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/100",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const people = pm.response.json();",
+              "const count = parseInt(pm.request.url.path[pm.request.url.path.length - 1]);",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    pm.expect(people).to.be.an(\"array\");",
+              "});",
+              "",
+              "pm.test(\"Array length matches count\", function () {",
+              "    pm.expect(people.length).to.eql(count);",
+              "});",
+              "",
+              "pm.test(\"Each person has required fields\", function () {",
+              "    people.forEach(p => {",
+              "        pm.expect(p.cpr).to.exist;",
+              "        pm.expect(p.firstName).to.exist;",
+              "        pm.expect(p.lastName).to.exist;",
+              "        pm.expect(p.gender).to.exist;",
+              "        pm.expect(p.dateOfBirth).to.exist;",
+              "        pm.expect(p.phoneNumber).to.exist;",
+              "        pm.expect(p.address).to.exist;",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/100",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "100"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/1 (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status should be 400 or 422 for invalid count\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 404, 422]);",
+              "});",
+              "",
+              "let data = {};",
+              "try {",
+              "    data = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "pm.test(\"Error message exists\", function () {",
+              "    pm.expect(data.message || data.error).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/0 (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status should be 400 or 422 for invalid count\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 404, 422]);",
+              "});",
+              "",
+              "let data = {};",
+              "try {",
+              "    data = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "pm.test(\"Error message exists\", function () {",
+              "    pm.expect(data.message || data.error).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "0"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/-1 (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status should be 400 or 422 for invalid count\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 404, 422]);",
+              "});",
+              "",
+              "let data = {};",
+              "try {",
+              "    data = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "pm.test(\"Error message exists\", function () {",
+              "    pm.expect(data.message || data.error).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/-1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "-1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/101 (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status should be 400 or 422 for invalid count\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 404, 422]);",
+              "});",
+              "",
+              "let data = {};",
+              "try {",
+              "    data = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "pm.test(\"Error message exists\", function () {",
+              "    pm.expect(data.message || data.error).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/101",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "101"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/abc (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status should be 400 or 422 for invalid count\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 404, 422]);",
+              "});",
+              "",
+              "let data = {};",
+              "try {",
+              "    data = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "pm.test(\"Error message exists\", function () {",
+              "    pm.expect(data.message || data.error).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/abc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "abc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /persons/2.5 (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status should be 400 or 422 for invalid count\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 404, 422]);",
+              "});",
+              "",
+              "let data = {};",
+              "try {",
+              "    data = pm.response.json();",
+              "} catch (e) {}",
+              "",
+              "pm.test(\"Error message exists\", function () {",
+              "    pm.expect(data.message || data.error).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/persons/2.5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "persons",
+            "2.5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /wrongroute (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Wrong route should return 404\", function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/wrongroute",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "wrongroute"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /namegender (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Wrong route should return 404\", function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/namegender",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "namegender"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /cprs (negative)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Wrong route should return 404\", function () {",
+              "    pm.expect(pm.response.code).to.eql(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cprs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "cprs"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7770/fakeinfo"
+    }
+  ]
+}

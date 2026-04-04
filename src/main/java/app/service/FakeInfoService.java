@@ -178,7 +178,12 @@ public class FakeInfoService {
             lastDigit = (lastDigit == 8) ? 9 : lastDigit + 1;
         }
 
-        return firstSix + digit7 + digit8 + digit9 + lastDigit;
+        String cpr = firstSix + digit7 + digit8 + digit9 + lastDigit;
+
+        if (!app.util.CPRValidator.isValid(cpr, gender)) {
+            throw new IllegalStateException("Generated CPR is invalid: " + cpr);
+        }
+        return cpr;
     }
 
     private String generateDoor() {

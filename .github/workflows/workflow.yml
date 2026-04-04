@@ -70,7 +70,7 @@ jobs:
 
       - name: Run Postman collection
         run: |
-          newman run Postman/FakeInfo API Tests.postman_collection.json
+          newman run Postman/fakeinfo.postman_collection.json
          
 
       # --- Node / Playwright ---

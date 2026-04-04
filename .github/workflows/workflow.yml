@@ -1,0 +1,116 @@
+name: CI WORKFLOW
+
+on:
+  push:
+    branches: [ DEV ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # DATABASE (PostgreSQL)
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: fakeinfodb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      # 1. Checkout backend repo
+      - name: Checkout backend repo
+        uses: actions/checkout@v4
+
+      # 2. Checkout frontend repo
+      - name: Checkout frontend repo
+        uses: actions/checkout@v4
+        with:
+          repository: Umair-230104/SoftQuality-Mandatory1-Frontend
+          path: frontend
+
+      # --- Java / Maven ---
+      - name: Set up JDK 21 (Oracle)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn --batch-mode clean verify
+
+      # WAIT FOR DATABASE
+      - name: Wait for database
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for database..."
+            sleep 2
+          done
+
+      # SEED DATABASE
+      - name: Seed database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d fakeinfodb -f SQL-Script/addresses.sql
+
+      # START BACKEND (Javalin)
+      - name: Start backend (Javalin)
+        run: mvn exec:java -Dexec.mainClass="app.Main" &
+
+      # --- POSTMAN TESTS ---
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman collection
+        run: |
+          newman run Postman/FakeInfo API Tests.postman_collection.json
+         
+
+      # --- Node / Playwright ---
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: E2E/FakeinfoPlaywright/package-lock.json
+
+      - name: Install Playwright dependencies
+        working-directory: ./E2E/FakeinfoPlaywright
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      # --- START FRONTEND SERVER ---
+      - name: Install http-server
+        run: npm install -g http-server
+
+      - name: Start frontend server
+        run: |
+          cd frontend
+          http-server . -p 5500 &
+
+      - name: Wait for frontend
+        run: npx wait-on http://127.0.0.1:5500
+
+      # --- Run Playwright tests ---
+      - name: Run Playwright tests
+        working-directory: ./E2E/FakeinfoPlaywright
+        run: npx playwright test
+
+      # --- SONARCLOUD ---
+      #- name: SonarCloud analysis
+        #env:
+          #SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #run: |
+          #mvn sonar:sonar \
+            #-Dsonar.projectKey=masih1903_fakeinfotest \
+            #-Dsonar.organization=masih1903 \
+            #-Dsonar.host.url=https://sonarcloud.io \
+            #-Dsonar.login=$SONAR_TOKEN

@@ -62,7 +62,18 @@ public class AddressValidator {
 
     // ---------------- NUMBER ----------------
 
-    private static final String HOUSE_NUMBER_SUFFIX = "ABCDEFGHKLMNPRSTUVWXYZ";
+    // NOTE:
+// Previously, only a subset of uppercase letters was allowed as suffix (e.g., excluding I, J, O, Q).
+// This caused a mismatch with the address generator, which produces any letter from A-Z.
+//
+// According to the assignment requirements, a house number may be followed by
+// an optional uppercase letter (no restriction on specific letters).
+//
+// Therefore, the validation has been updated to allow ALL uppercase letters (A-Z),
+// while still rejecting lowercase letters and invalid formats.
+
+
+    private static final String HOUSE_NUMBER_SUFFIX = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static void validateNumber(String number) {
         if (number == null) {

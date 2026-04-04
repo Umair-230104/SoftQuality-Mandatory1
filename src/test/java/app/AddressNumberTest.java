@@ -90,15 +90,18 @@ class AddressNumberTest {
         assertEquals("Number must have at most one suffix letter", ex.getMessage());
     }
 
+
+    // NOTE:
+// This test previously expected certain uppercase letters (e.g., I, J, O, Q) to be invalid.
+// However, according to the assignment, any uppercase letter is allowed as suffix.
+//
+// The test has therefore been updated to reflect that all uppercase suffix letters are valid.
     @ParameterizedTest
     @ValueSource(strings = {"43I", "43J", "43O", "43Q"})
-    void invalid_illegal_suffix(String number) {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> AddressValidator.validateNumber(number)
-        );
-        assertEquals("Suffix letter is not allowed", ex.getMessage());
+    void valid_suffix_letters(String number) {
+        assertDoesNotThrow(() -> AddressValidator.validateNumber(number));
     }
+
 
     @ParameterizedTest
     @ValueSource(strings = {"43%"})

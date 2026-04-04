@@ -19,8 +19,7 @@ public class FakeInfoService {
     private final NameDao nameDao = new NameDao();
     private final PostalCodeDAO postalCodeDAO;
 
-    public FakeInfoService(PostalCodeDAO postalCodeDAO)
-    {
+    public FakeInfoService(PostalCodeDAO postalCodeDAO) {
         this.postalCodeDAO = postalCodeDAO;
     }
 
@@ -84,13 +83,11 @@ public class FakeInfoService {
         );
     }
 
-    public AddressDTO generateAddress()
-    {
+    public AddressDTO generateAddress() {
         String street = generateRandomText(12 + random.nextInt(20)).trim();
         String number = String.valueOf(random.nextInt(999) + 1);
 
-        if (random.nextInt(10) < 2)
-        {
+        if (random.nextInt(10) < 2) {
             number += (char) ('A' + random.nextInt(26));
         }
 
@@ -111,6 +108,7 @@ public class FakeInfoService {
                 postalCode.getTownName()
         );
     }
+
     public PhoneDTO generatePhoneNumber() {
         String prefix = PHONE_PREFIXES[random.nextInt(PHONE_PREFIXES.length)];
         StringBuilder phone = new StringBuilder(prefix);

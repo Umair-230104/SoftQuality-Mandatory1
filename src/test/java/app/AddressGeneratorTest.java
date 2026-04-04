@@ -1,13 +1,13 @@
 package app;
 
-
 import app.daos.PostalCodeDAO;
 import app.dtos.AddressDTO;
 import app.entities.PostalCode;
+import app.service.FakeInfoService;
+import app.util.AddressValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import app.service.FakeInfoService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,111 +19,87 @@ class AddressGeneratorTest {
 
     @BeforeEach
     void setup() {
-        // Mock PostalCodeDAO to avoid real DB access
+        // Mock DAO to avoid DB access
         postalCodeDAO = mock(PostalCodeDAO.class);
-        when(postalCodeDAO.getRandomPostalCode()).thenReturn(new PostalCode("1000", "Copenhagen"));
+        when(postalCodeDAO.getRandomPostalCode())
+                .thenReturn(new PostalCode("1000", "Copenhagen"));
 
         fakeInfoService = new FakeInfoService(postalCodeDAO);
     }
 
     // ---------------------------------
-    // STREET TESTS
+    // SINGLE ADDRESS VALIDATION
     // ---------------------------------
 
     @Test
-    @DisplayName("Street: valid random string length >= 12")
-    void testStreetValidLength() {
+    @DisplayName("Generated address is fully valid")
+    void testGeneratedAddressIsValid() {
         AddressDTO address = fakeInfoService.generateAddress();
-        assertNotNull(address.getStreet());
-        assertTrue(address.getStreet().length() >= 12, "Street should have at least 12 characters");
-    }
 
-    @Test
-    @DisplayName("Street: cannot be null or empty")
-    void testStreetNotNullOrEmpty() {
-        AddressDTO address = fakeInfoService.generateAddress();
-        assertNotNull(address.getStreet());
-        assertFalse(address.getStreet().isEmpty(), "Street should not be empty");
-    }
+        assertNotNull(address);
 
-    // ---------------------------------
-    // NUMBER TESTS
-    // ---------------------------------
+        assertDoesNotThrow(() ->
+                AddressValidator.validateStreet(address.getStreet()));
 
-    @Test
-    @DisplayName("Number: 1-999, optionally with uppercase letter")
-    void testNumberRangeAndFormat() {
-        AddressDTO address = fakeInfoService.generateAddress();
-        String number = address.getNumber();
-        assertNotNull(number);
-        assertFalse(number.isEmpty());
+        assertDoesNotThrow(() ->
+                AddressValidator.validateNumber(address.getNumber()));
 
-        // Check numeric part
-        String digits = number.replaceAll("[A-Z]", "");
-        int num = Integer.parseInt(digits);
-        assertTrue(num >= 1 && num <= 999, "Number should be 1-999");
+        assertDoesNotThrow(() ->
+                AddressValidator.validateFloor(address.getFloor()));
 
-        // Optional uppercase letter
-        if (number.length() > digits.length()) {
-            char letter = number.charAt(number.length() - 1);
-            assertTrue(letter >= 'A' && letter <= 'Z', "Optional letter must be uppercase A-Z");
-        }
+        assertDoesNotThrow(() ->
+                AddressValidator.validateDoor(address.getDoor()));
+
+        assertEquals("1000", address.getPostalCode());
+        assertEquals("Copenhagen", address.getTown());
     }
 
     // ---------------------------------
-    // FLOOR TESTS
+    // MULTIPLE GENERATED ADDRESSES
     // ---------------------------------
 
     @Test
-    @DisplayName("Floor: valid values are 'st' or 1-99")
-    void testFloorValid() {
-        AddressDTO address = fakeInfoService.generateAddress();
-        String floor = address.getFloor();
-        assertNotNull(floor);
-
-        if ("st".equals(floor)) return; // valid
-        try {
-            int f = Integer.parseInt(floor);
-            assertTrue(f >= 1 && f <= 99, "Floor number must be 1-99");
-        } catch (NumberFormatException e) {
-            fail("Floor must be 'st' or a number 1-99");
-        }
-    }
-
-    // ---------------------------------
-    // DOOR TESTS
-    // ---------------------------------
-
-    @Test
-    @DisplayName("Door: valid formats")
-    void testDoorValid() {
-        AddressDTO address = fakeInfoService.generateAddress();
-        String door = address.getDoor();
-        assertNotNull(door);
-
-        boolean valid = door.matches("th|mf|tv") ||
-                door.matches("^[a-z]\\d{1,3}$") ||
-                door.matches("^[a-z]-\\d{1,3}$") ||
-                (door.matches("\\d+") && Integer.parseInt(door) >= 1 && Integer.parseInt(door) <= 50);
-
-        assertTrue(valid, "Door format is invalid: " + door);
-    }
-
-    // ---------------------------------
-    // GENERATE MULTIPLE ADDRESSES
-    // ---------------------------------
-
-    @Test
-    @DisplayName("Generate multiple addresses")
+    @DisplayName("Multiple generated addresses are valid")
     void testGenerateMultipleAddresses() {
         for (int i = 0; i < 10; i++) {
             AddressDTO address = fakeInfoService.generateAddress();
-            assertNotNull(address.getStreet());
-            assertNotNull(address.getNumber());
-            assertNotNull(address.getFloor());
-            assertNotNull(address.getDoor());
+
+            assertNotNull(address);
+
+            assertDoesNotThrow(() ->
+                    AddressValidator.validateStreet(address.getStreet()));
+
+            assertDoesNotThrow(() ->
+                    AddressValidator.validateNumber(address.getNumber()));
+
+            assertDoesNotThrow(() ->
+                    AddressValidator.validateFloor(address.getFloor()));
+
+            assertDoesNotThrow(() ->
+                    AddressValidator.validateDoor(address.getDoor()));
+
             assertEquals("1000", address.getPostalCode());
             assertEquals("Copenhagen", address.getTown());
         }
+    }
+
+    // ---------------------------------
+    // BASIC STRUCTURE CHECKS
+    // ---------------------------------
+
+    @Test
+    @DisplayName("Generated address fields are never null or empty")
+    void testFieldsNotNullOrEmpty() {
+        AddressDTO address = fakeInfoService.generateAddress();
+
+        assertNotNull(address.getStreet());
+        assertNotNull(address.getNumber());
+        assertNotNull(address.getFloor());
+        assertNotNull(address.getDoor());
+
+        assertFalse(address.getStreet().isEmpty());
+        assertFalse(address.getNumber().isEmpty());
+        assertFalse(address.getFloor().isEmpty());
+        assertFalse(address.getDoor().isEmpty());
     }
 }

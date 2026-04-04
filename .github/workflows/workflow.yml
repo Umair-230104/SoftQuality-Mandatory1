@@ -2,7 +2,7 @@ name: CI WORKFLOW
 
 on:
   push:
-    branches: [ DEV ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -104,13 +104,13 @@ jobs:
         working-directory: ./E2E/FakeinfoPlaywright
         run: npx playwright test
 
-      # --- SONARCLOUD ---
-      #- name: SonarCloud analysis
-        #env:
-          #SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        #run: |
-          #mvn sonar:sonar \
-            #-Dsonar.projectKey=masih1903_fakeinfotest \
-            #-Dsonar.organization=masih1903 \
-            #-Dsonar.host.url=https://sonarcloud.io \
-            #-Dsonar.login=$SONAR_TOKEN
+       # --- SONARCLOUD ---
+      - name: SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=umair230104_fakeinfo \
+            -Dsonar.organization=Umair Tafail \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN

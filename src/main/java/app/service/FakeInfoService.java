@@ -161,7 +161,13 @@ public class FakeInfoService {
         long randomDay = startEpochDay +
                 (long) (random.nextDouble() * (endEpochDay - startEpochDay));
 
-        return LocalDate.ofEpochDay(randomDay);
+        LocalDate dob = LocalDate.ofEpochDay(randomDay);
+
+        if (!app.util.DOBValidator.isValid(dob)) {
+            throw new IllegalStateException("Generated DOB is invalid: " + dob);
+        }
+
+        return dob;
     }
 
     private String generateCprFrom(LocalDate birthDate, Gender gender) {

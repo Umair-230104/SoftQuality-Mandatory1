@@ -29,7 +29,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <hikari.version>5.1.0</hikari.version>
 
-        <sonar.projectKey>umair230104_fakeinfo</sonar.projectKey>
+        <sonar.projectKey>umair230104</sonar.projectKey>
         <sonar.organization>umair230104</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>

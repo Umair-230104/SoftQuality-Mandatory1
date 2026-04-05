@@ -104,7 +104,8 @@ jobs:
         working-directory: ./E2E/FakeinfoPlaywright
         run: npx playwright test
 
-       # --- SONARCLOUD ---
+
+      # --- SONARCLOUD ---
       - name: SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -113,4 +114,5 @@ jobs:
             -Dsonar.projectKey=Umair-230104_SoftQuality-Mandatory1 \
             -Dsonar.organization=umair230104 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml

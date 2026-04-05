@@ -32,6 +32,7 @@
         <sonar.projectKey>Umair-230104_SoftQuality-Mandatory1</sonar.projectKey>
         <sonar.organization>umair230104</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <repositories>
@@ -167,6 +168,32 @@
 
         <plugins>
 
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Shade (fat jar) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -219,7 +246,7 @@
                     </includes>
 
                     <!-- Fix for Byte Buddy warning -->
-                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
                 </configuration>
             </plugin>
 

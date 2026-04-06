@@ -1,28 +1,29 @@
+
 ---
 
 # 🚀 FakeInfo Backend – Setup Guide
 
-Denne guide viser, hvordan du sætter projektet op lokalt og får det til at virke med PostgreSQL og Docker.
+This guide shows how to set up the project locally and get it running with PostgreSQL and Docker.
 
 ---
 
-## 📥 1. Clone projektet
+## 📥 1. Clone the project
 
-Start med at hente projektet ned på din computer:
+Start by cloning the project to your computer:
 
 ```bash
 git clone <repo-url>
-cd <repo-navn>
+cd <repo-name>
 ```
 
 ---
 
-## 🐘 2. Opret database i pgAdmin
+## 🐘 2. Create database in pgAdmin
 
-1. Åbn **pgAdmin**
-2. Find din **Postgres (Docker container)**
-3. Højreklik på **Databases → Create → Database**
-4. Navngiv databasen:
+1. Open **pgAdmin**
+2. Locate your **Postgres (Docker container)**
+3. Right-click on **Databases → Create → Database**
+4. Name the database:
 
 ```text
 fakeinfodb
@@ -30,51 +31,51 @@ fakeinfodb
 
 ---
 
-## 🧾 3. Indsæt SQL data
+## 🧾 3. Insert SQL data
 
-1. Gå til mappen i projektet:
+1. Go to the project folder:
 
 ```text
 SQL-Script/addresses.sql
 ```
 
-2. Kopiér hele indholdet
+2. Copy the entire content
 
-3. Gå tilbage til **pgAdmin**
+3. Go back to **pgAdmin**
 
-4. Højreklik på `fakeinfodb` → **Query Tool**
+4. Right-click on `fakeinfodb` → **Query Tool**
 
-5. Indsæt scriptet
+5. Paste the script
 
-6. Tryk **Execute (▶)**
+6. Click **Execute (▶)**
 
-✅ Nu er dine adresser og postnumre indsat i databasen
+✅ Your addresses and postal codes are now inserted into the database
 
 ---
 
-## 🔌 4. Tilføj database i IntelliJ
+## 🔌 4. Add database in IntelliJ
 
-1. Åbn projektet i IntelliJ
-2. Gå til højre side → **Database**
-3. Klik på `+` → **Data Source → PostgreSQL**
-4. Udfyld:
+1. Open the project in IntelliJ
+2. Go to the right panel → **Database**
+3. Click `+` → **Data Source → PostgreSQL**
+4. Fill in:
 
 * Host: `localhost`
 * Port: `5432`
 * Database: `fakeinfodb`
-* User: (din postgres user)
-* Password: (din postgres password)
+* User: (your postgres user)
+* Password: (your postgres password)
 
-5. Klik **Test Connection → OK**
+5. Click **Test Connection → OK**
 
 ---
 
-## ▶️ 5. Kør backend
+## ▶️ 5. Run backend
 
-1. Find din `Main` klasse
-2. Klik **Run**
+1. Locate your `Main` class
+2. Click **Run**
 
-Serveren starter på:
+The server starts at:
 
 ```text
 http://localhost:7770
@@ -84,7 +85,7 @@ http://localhost:7770
 
 ## 🌐 6. Test endpoints
 
-Du kan nu teste i browser eller Postman:
+You can now test using a browser or Postman:
 
 ```text
 http://localhost:7770/fakeinfo/cpr
@@ -102,19 +103,20 @@ http://localhost:7770/fakeinfo/persons/5
 
 ## ✅ Done!
 
-Hvis alt er sat korrekt op:
+If everything is set up correctly:
 
-* Du får data fra databasen
-* Adresser er realistiske (fra Postgres)
-* Alle endpoints virker
-
----
-
-Hvis noget ikke virker:
-
-* Tjek at databasen hedder `fakeinfodb`
-* Tjek at SQL-scriptet er kørt
-* Tjek at serveren kører på port `7770`
+* You receive data from the database
+* Addresses are realistic (from Postgres)
+* All endpoints work
 
 ---
 
+## ❗ Troubleshooting
+
+If something doesn’t work:
+
+* Make sure the database name is `fakeinfodb`
+* Ensure the SQL script has been executed
+* Verify that the server is running on port `7770`
+
+---
